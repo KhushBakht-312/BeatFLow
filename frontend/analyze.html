@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Analyze</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="icon" href="./images/heart.png" type="image/png">
+  <!-- Include html2canvas for download report -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="navbar" style="opacity:0.9;">
+    <div class="logo">
+      <img src="/images/heart.png" alt="Logo">
+      <span style="font-family:'Satisfy', cursive;">BeatFlow</span>
+    </div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/analyze" class="active">Analyze</a>
+      <a href="/about">About</a>
+    </nav>
+  </div>
+</header>
+
+<section class="analyze">
+  <div class="analyze-container">
+
+    <div class="analyze-text">
+      <h1>Analyze Your Heartbeat</h1>
+      <p>Get instant AI-powered insights through BeatFlow.<br>Monitor your heartbeat health.</p>
+      <div class="hint-card">
+         Use clearer ECG Image for higher precision!
+      </div>
+    </div>
+
+    <div class="analyze-section">
+      <!-- GIF Left -->
+      <div class="analyze-gif">
+        <img src="/images/heatt.gif" alt="ECG Animation">
+      </div>
+
+      <!-- Upload Box Center -->
+      <div class="analyze-box">
+        <h4>Upload your ECG Image</h4><br>
+        <label class="custom-file-upload">
+          <input type="file" id="ecgImage" accept="image/*">
+          EKG Image
+        </label>
+
+        <button onclick="analyzeImage()">Analyze Image</button>
+
+        <div class="loader" id="imgLoader">Analyzing ECG Image...</div>
+        <br>
+
+        <div class="result-box" id="imgResult" style="display:none;">
+          <div id="reportDiv">
+            <p><strong>Status:</strong> <span id="imgStatus">--</span></p>
+            <p><strong>Confidence:</strong> <span id="imgConf">--</span>%</p>
+            <p><strong>Insight:</strong> <span id="imgInsight">--</span></p>
+            <img id="imgPreview" style="max-width: 200px; display:block; margin-top:10px;">
+          </div>
+          <button class="download-btn" onclick="downloadResult('reportDiv', 'ECG_Report')">Download Report</button>
+        </div>
+
+        <br>
+
+        <div class="possibilities-box" id="possibilitiesBox" style="display:none"></div>
+      </div>
+
+      <!-- Uploaded Image Right -->
+      <div class="image-preview-container">
+        <div class="timeline" id="timeline" style="display:none">
+          <ul>
+            <li>Image uploaded</li>
+            <li>Preprocessing applied</li>
+            <li>Feature extraction</li>
+            <li>CNN classification</li>
+            <li>Result generated</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="system-notes">
+      <h4>Your History</h4>
+      <div id="historyBox"></div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+let historyList = [];
+
+function analyzeImage() {
+  const img = document.getElementById("ecgImage").files[0];
+  if (!img) { alert("Please upload an ECG image."); return; }
+
+  document.getElementById("imgResult").style.display = "none";
+  document.getElementById("imgLoader").style.display = "block";
+  // ─── TIMELINE ───
+  const timeline = document.getElementById("timeline");
+  timeline.style.display = "block"; // show timeline after upload
+
+// Reset timeline each time
+  timeline.querySelectorAll("li").forEach(li => li.style.opacity = 0);
+
+// Animate timeline steps sequentially
+  const steps = timeline.querySelectorAll("li");
+  steps.forEach((step, index) => {
+  setTimeout(() => {
+    step.style.opacity = 1;
+  }, 500 * (index + 1)); // 0.5s stagger between steps
+});
+
+
+  const formData = new FormData();
+  formData.append("image", img);
+
+  fetch("/analyze", { method: "POST", body: formData })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("imgLoader").style.display = "none";
+      if (data.error) { alert(data.error); return; }
+
+      document.getElementById("imgResult").style.display = "block";
+
+      const statusEl = document.getElementById("imgStatus");
+      const confEl = document.getElementById("imgConf");
+      const insightEl = document.getElementById("imgInsight");
+      const preview = document.getElementById("imgPreview");
+
+      statusEl.innerText = data.image_status || "--";
+      confEl.innerText = data.confidence_image || "--";
+      insightEl.innerText = data.insight_image || "--";
+
+      if (data.image_status === "Healthy") {
+        statusEl.style.color = "green";
+      } else if (data.image_status === "Unhealthy") {
+        statusEl.style.color = "red";
+      } else if (data.image_status === "Invalid") {
+        statusEl.style.color = "#f59e0b";
+        confEl.innerText = "--";
+      }
+
+      if (data.possibilities && data.possibilities.length > 0 && data.image_status !== "Invalid") {
+        const possBox = document.getElementById("possibilitiesBox");
+        possBox.style.display = "block";
+        possBox.innerHTML = "<strong>Possible conditions:</strong> " + data.possibilities.join(", ");
+      }
+
+      if (data.image_url) {
+        preview.src = data.image_url;
+        preview.style.display = "block";
+      }
+
+      // ─── HISTORY ───
+      historyList.unshift({
+        file: img.name,
+        status: data.image_status,
+        confidence: data.confidence_image
+      });
+
+      let historyHTML = "<table class='history-table'><tr><th>File</th><th>Status</th><th>Confidence</th><th>Action</th></tr>";
+      historyList.slice(0,3).forEach(h => {
+        historyHTML += `<tr>
+          <td>${h.file}</td>
+          <td>${h.status}</td>
+          <td>${h.confidence || "--"}%</td>
+          <td><button class="download-btn" onclick="downloadResult('reportDiv','${h.file}')">Download</button></td>
+        </tr>`;
+      });
+      historyHTML += "</table>";
+      document.getElementById("historyBox").innerHTML = historyHTML;
+    })
+    .catch(() => {
+      document.getElementById("imgLoader").style.display = "none";
+      alert("Backend is not running.");
+    });
+}
+
+// ─── DOWNLOAD REPORT ───
+function downloadResult(reportId, filename) {
+  const reportDiv = document.getElementById(reportId);
+  if (!reportDiv) return;
+
+  html2canvas(reportDiv).then(canvas => {
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = filename.replace(/\.[^/.]+$/, "") + "_report.png";
+    link.click();
+  });
+}
+</script>
+
+<footer> &copy; 2026 BeatFlow - All rights reserved</footer>
+</body>
+</html>
