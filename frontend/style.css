@@ -1,8 +1,6 @@
-/* Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@300;400;500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Satisfy&display=swap');
 
-/* Reset & Base */
 * {
   margin: 0;
   padding: 0;
@@ -24,7 +22,6 @@ body {
 
 a { text-decoration: none; color: inherit; }
 
-/* Header */
 header {
   position: sticky;
   top: 0;
@@ -43,17 +40,17 @@ header {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;          /* last layer */
+  width: 100%;       
   pointer-events: none;
   z-index: -1; 
 }
 
 .bg-media img {
-  width: 100vw;        /* full screen width */
-  height: 100%;       /* IMPORTANT */
+  width: 100vw;       
+  height: 100%;     
   max-width: 150%;
   display: block;
-  margin: 0 auto;      /* center horizontally */
+  margin: 0 auto;    
   opacity: 0.09;
   z-index: -1; 
 }
@@ -62,22 +59,23 @@ header {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;          /* last layer */
+  width: 100%;         
   pointer-events: none;
   z-index: -1; 
 }
 
 .bg-media2 img {
- width: 100vw;        /* full screen width */
-  height: 100%;       /* IMPORTANT */
+ width: 100vw;        
+  height: 100%;     
   max-width: 150%;
   display: block;
-  margin: 0 auto;      /* center horizontally */
+  margin: 0 auto;     
   opacity: 1;
    z-index: -1; 
 }
 
 .hint-card {
+  width: 35%;
   background: #fff3cd;
   border-left: 6px solid #ffc107;
   color: #6b4f00;
@@ -127,15 +125,12 @@ nav a:hover::after,
 nav a.active::after { width: 100%; }
 nav a.active { color: #ffe5e5; }
 
-/* Sections */
 section { width: 90%; margin: 80px auto; animation: fadeIn 0.6s ease-in; }
 
-/* Headings & text */
 h1 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 42px; color: #d10000; margin-bottom: 8px; }
 h2 { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 28px; margin-bottom: 11px; }
 p { font-size: 16px; margin-bottom: 9px; }
 
-/* Footer */
 footer {
   margin-top: auto;
   background: #d10000;
@@ -155,7 +150,7 @@ footer {
 }
 
 .analyze-gif img {
-  max-width: 200px; /* adjust size */
+  max-width: 200px; 
   border-radius: 8px;
 }
 
@@ -163,8 +158,8 @@ footer {
   flex: 1 1 300px;
   display: flex;
   flex-direction: column;
-  justify-content: center;  /* centers vertically */
-  align-items: center;      /* centers horizontally */
+  justify-content: center;  
+  align-items: center;     
   gap: 20px;
 }
 
@@ -195,7 +190,6 @@ footer {
   background-color: #a60000;
 }
 
-/* Hero Section (Home page) */
 .hero {
   display: flex;
   flex-wrap: wrap;
@@ -213,8 +207,8 @@ footer {
   font-weight: 500;
   font-size: 42px;
   color: #d10000;
-  margin-bottom: 8px; /* reduced spacing */
-  line-height: 1.2;    /* optional: make lines closer */
+  margin-bottom: 8px; 
+  line-height: 1.2;    
 }
 
 .hero-text p { font-size: 16px; margin-bottom: 20px; }
@@ -237,7 +231,7 @@ footer {
   border-radius: 8px;
 }
 
-/* Key Features - Home page blocks */
+
 .features, .extra-features { margin-top: 60px; }
 .feature-box { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; }
 .feature {
@@ -251,7 +245,6 @@ footer {
 .feature:hover { transform: translateY(-5px); }
 .feature img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 15px; }
 
-/* About Page */
 .about-section { width: 90%; margin: 80px auto; animation: fadeIn 0.6s ease-in; }
 .about-content { display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start; }
 .about-text { flex: 1 1 500px; }
@@ -260,7 +253,6 @@ footer {
 .about-image { flex: 0 0 300px; }
 .about-image img { width: 100%; border-radius: 8px; }
 
-/* Extra content blocks on About page */
 .about-extra {
   display: flex;
   flex-wrap: wrap;
@@ -276,7 +268,7 @@ footer {
 }
 .about-extra .block img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px; }
 
-/* Analyze Page */
+
 .analyze-box input[type=file] { padding: 6px; font-size: 16px; margin-right: 12px; }
 .analyze-box button {
   padding: 8px 18px;
@@ -288,11 +280,11 @@ footer {
 }
 .analyze-box button:hover { background-color: #a60000; }
 
-/* Images floated right in sections */
+
 section img { margin-left: 25px; max-width: 300px; border-radius: 8px; }
 section::after { content: ""; display: table; clear: both; }
 
-/* Responsive */
+/* responsive... */
 @media screen and (max-width: 768px) {
   .hero { flex-direction: column; text-align: center; }
   .hero-image { margin-top: 20px; }
@@ -370,30 +362,8 @@ section::after { content: ""; display: table; clear: both; }
 .custom-file-upload:hover { background: #f9eaea; }
 
 
-/* .system-notes {
-  margin-top: 15px;
-  background: #fff9f2;
-  padding: 10px 12px;
-  border-left: 4px solid #ffc107;
-  border-radius: 8px;
-}
-
-.system-notes h4 {
-  margin-bottom: 8px;
-  font-size: 16px;
-  color: #a60000;
-}
-
-.system-notes ul {
-  padding-left: 18px;
-}
-
-.system-notes li {
-  font-size: 14px;
-  margin-bottom: 4px;
-} */
-
 .history-table {
+  color: #000;
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
@@ -414,7 +384,7 @@ section::after { content: ""; display: table; clear: both; }
 .status-invalid { color: #f59e0b; }
 
 .mini-gif {
-  width: 90px;          /* small size */
+  width: 90px;         
   height: 90px;
   vertical-align: middle;
   margin-left: 8px;
@@ -423,13 +393,12 @@ section::after { content: ""; display: table; clear: both; }
 .analyze-section {
   display: flex;
   gap: 30px;
-  flex-wrap: nowrap; /* horizontal row */
+  flex-wrap: nowrap; 
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 60px;
 }
 
-/* Left side (GIF + upload + result + timeline) */
 .analyze-left {
   flex: 1 1 500px;
   display: flex;
@@ -440,9 +409,9 @@ section::after { content: ""; display: table; clear: both; }
 .result-box {
   display: flex;
   flex-direction: column;
-  align-items: center; /* center horizontally */
+  align-items: center; 
   justify-content: center;
-  gap: 15px; /* spacing between elements */
+  gap: 15px; 
   background-color: #f9fafb;
   padding: 15px;
   border-radius: 10px;
@@ -457,7 +426,7 @@ section::after { content: ""; display: table; clear: both; }
 }
 
 .download-btn {
-  background-color: #d52e00; /* nicer blue */
+  background-color: #d52e00; 
   color: white;
   border: none;
   padding: 6px 12px;
@@ -489,7 +458,7 @@ section::after { content: ""; display: table; clear: both; }
 
 .timeline {
   display: flex;
-  justify-content: center; /* center horizontally */
+  justify-content: center; 
   margin-top: 20px;
 }
 

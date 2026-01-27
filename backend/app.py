@@ -6,43 +6,36 @@ from PIL import Image
 import random
 import torch.nn as nn
 
-# ─── Paths ─────────────────────────────
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))   # backend folder
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))   #backend folder
 FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploaded_ecg")
 STAGE1_MODEL_PATH = os.path.join(BASE_DIR, "ecg_filter_model.pth")
 ECG_MODEL_PATH = os.path.join(BASE_DIR, "ecg_model.pth")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# ─── Flask App ────────────────────────
 app = Flask(__name__)
 
-# ─── Device ──────────────────────────
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# ─── Stage-1: ECG filter model ───────
 stage1_model = models.mobilenet_v3_small(pretrained=True)
 stage1_model.classifier[3] = nn.Linear(stage1_model.classifier[3].in_features, 2)
 stage1_model.load_state_dict(torch.load(STAGE1_MODEL_PATH, map_location=device))
 stage1_model.to(device)
 stage1_model.eval()
 
-# ─── Stage-2: ECG classifier (Normal/Abnormal) ───
 ecg_model = models.efficientnet_b0(pretrained=True)
 ecg_model.classifier[1] = nn.Linear(ecg_model.classifier[1].in_features, 2)
 ecg_model.load_state_dict(torch.load(ECG_MODEL_PATH, map_location=device))
 ecg_model.to(device)
 ecg_model.eval()
 
-# ─── Transforms ───────────────────────
-# Stage-1: same as training of stage1
 transform_stage1 = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize([0.5], [0.5])
 ])
 
-# Stage-2: same as training of ecg_model
 transform_stage2 = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -50,7 +43,6 @@ transform_stage2 = transforms.Compose([
                          [0.229, 0.224, 0.225])
 ])
 
-# ─── Insights & Possibilities ─────────
 normal_insights = [
     "Heartbeat is normal, good rhythm detected.",
     "Heart rate variability is within healthy range.",
@@ -92,7 +84,6 @@ abnormal_possibilities = [
     "Ventricular fibrillation", "Other cardiac disorders"
 ]
 
-# ─── Routes ──────────────────────────
 @app.route("/")
 def home():
     return send_from_directory(FRONTEND_DIR, "index.html")
@@ -108,12 +99,11 @@ def analyze_page():
         if not img_file:
             return jsonify({"error": "Please upload an ECG image."}), 400
 
-        # Save uploaded image
         img_path = os.path.join(UPLOAD_DIR, img_file.filename)
         img_file.save(img_path)
 
         try:
-            # ─── Stage-1: ECG filter
+        
             img_stage1 = Image.open(img_path).convert("RGB")
             tensor_stage1 = transform_stage1(img_stage1).unsqueeze(0).to(device)
             with torch.no_grad():
@@ -121,7 +111,7 @@ def analyze_page():
                 prob1 = torch.nn.functional.softmax(out1, dim=1)
                 conf1, pred1 = torch.max(prob1, 1)
 
-            if pred1.item() == 1:  # Not ECG
+            if pred1.item() == 1: 
                 return jsonify({
                     "image_status": "Invalid",
                     "confidence_image": round(conf1.item() * 100, 2),
@@ -130,7 +120,7 @@ def analyze_page():
                     "possibilities": []
                 })
 
-            # ─── Stage-2: ECG classification (Normal/Abnormal)
+        
             img_stage2 = transform_stage2(img_stage1).unsqueeze(0).to(device)
             with torch.no_grad():
                 out2 = ecg_model(img_stage2)
@@ -177,6 +167,5 @@ def images(filename):
 def static_files(filename):
     return send_from_directory(FRONTEND_DIR, filename)
 
-# ─── Run Server ─────────────────────
 if __name__ == "__main__":
     app.run(debug=True)
